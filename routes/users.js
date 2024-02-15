@@ -6,52 +6,48 @@
 /* eslint-disable no-else-return */
 const express = require('express');
 const router = require('express').Router();
+const auth = require('../middlewares/auth');
 const { usersController, authController } = require('../controllers/index');
 const asyncWrapper = require('../utils/async-wrapper');
 const helper = require('../controllers/helper');
 
 // parsing body as JSON object
 router.use(express.json());
-
-router.post('/signup', async (req, res, next) => {
-  const [err, addedUser] = await asyncWrapper(authController.signUp(req.body));
+router.post('/', async (req, res, next) => {
+  const [err, addedUser] = await asyncWrapper(usersController.signUp(req.body));
   if (!err) {
-    return res.status(200).json({ User: addedUser });
+    return res.status(200).json(addedUser);
   }
   return next(err);
-});
+} );
+
 router.post('/login', async function (req, res, next) {
   if (!req.body.username && !req.body.password) return next(new Error('please enter username and password'));
   else if (!req.body.username) return next(new Error('please enter username'));
   else if (!req.body.password) return next(new Error('please enter password'));
   else {
-    const [err, auth] = await asyncWrapper(usersController.login(req.body.username, req.body.password));
+    const [err, token] = await asyncWrapper(usersController.login(req.body.username, req.body.password));
     if (!err) {
       return res.status(200).json({
         status: 'success',
         message: 'you are logged in',
-        token: auth,
+        tokens: token,
+        User:' ',
       });
     }
     return next(err);
   }
 });
+
+router.use( auth );
+
 router.get('/', async (req, res) => {
-  const users = await usersController.getAll();
   res.status(200).json({
     message: 'success',
-    data: users,
+    data: req.user,
   });
 });
 
-router.get('/:id', async (req, res, next) => {
-  const [err, user] = await asyncWrapper(usersController.getUser(req.params.id));
-  if (!err) {
-    // check if user exists and return not found if no
-    return helper.checkExistence(res, user);
-  }
-  return next(err);
-});
 router.get('/:id/todos', async (req, res, next) => {
   const [err, todos] = await asyncWrapper(usersController.getTodosOfUser(req.params.id));
   if (!err) {
@@ -62,8 +58,8 @@ router.get('/:id/todos', async (req, res, next) => {
   }
   return next(err);
 });
-router.patch('/:id', async (req, res, next) => {
-  const [err, updatedUser] = await asyncWrapper(usersController.update(req.params.id, req.body));
+router.patch('/', async (req, res, next) => {
+  const [err, updatedUser] = await asyncWrapper(usersController.update(req.user.id, req.body));
   if (!err) {
     return helper.checkExistence(res, updatedUser);
   }

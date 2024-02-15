@@ -35,7 +35,7 @@ const deleteUser = async (id) => {
   return deletedUser;
 };
 const signUp = async function (values) {
-  const addedUser = await users.create(values);
+  const addedUser = await Users.create(values);
   return { addedUser };
 };
 const login = async function (userName, password) {
@@ -51,11 +51,11 @@ const login = async function (userName, password) {
       );
       return token;
     }
-    const err = new Error( "wrong password or username" );
+    const err = new Error('wrong password or username');
     err.statusCode = 401;
     throw (err);
   }
-  const err = new Error( "user not found" );
+  const err = new Error('user not found');
   err.statusCode = 404;
   throw (err);
 };
