@@ -1,3 +1,5 @@
+const ToDos = require('../models/todos');
+
 const checkExistence = (res, obj) => {
   if (obj) {
     res.status(200).json({
@@ -11,6 +13,12 @@ const checkExistence = (res, obj) => {
     });
   }
 };
+const checkauth = function (id) {
+  const todo = ToDos.find(id);
+  if (todo) return true;
+  return false;
+};
 module.exports = {
   checkExistence,
-}
+  checkauth,
+};

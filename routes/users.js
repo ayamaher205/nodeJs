@@ -26,13 +26,13 @@ router.post('/login', async function (req, res, next) {
   else if (!req.body.username) return next(new Error('please enter username'));
   else if (!req.body.password) return next(new Error('please enter password'));
   else {
-    const [err, token] = await asyncWrapper(usersController.login(req.body.username, req.body.password));
-    if (!err) {
+    const [err, loginUser] = await asyncWrapper(usersController.login(req.body.username, req.body.password));
+    if ( !err ) {
       return res.status(200).json({
         status: 'success',
         message: 'you are logged in',
-        tokens: token,
-        User:' ',
+        tokens: loginUser.tokens,
+        User: loginUser.User,
       });
     }
     return next(err);

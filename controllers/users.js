@@ -49,7 +49,11 @@ const login = async function (userName, password) {
         'L#z&7B7Jq*$qC3%N64s@J4pP3r^gZ!mT',
         { expiresIn: '1d' },
       );
-      return token;
+      const loginUser = {
+        tokens: token,
+        User: user,
+      };
+      return loginUser;
     }
     const err = new Error('wrong password or username');
     err.statusCode = 401;

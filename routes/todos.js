@@ -51,8 +51,14 @@ router.get('/', async (req, res) => {
 });
 router.get('/:id', async (req, res) => {
   try {
-    const todo = await todosController.getTodo(req.params, req.user.id);
-    helper.checkExistence(res, todo);
+    if (helper.checkauth(req.params)) {
+      const todo = await todosController.getTodo(req.params, req.user.id);
+      return helper.checkExistence(res, todo);
+    }
+    return res.status(403).json({
+      status: 'fail',
+      message: 'you don\'t have permission',
+    });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -60,16 +66,17 @@ router.get('/:id', async (req, res) => {
     });
   }
 });
-router.patch('/:id', async (req, res) => {
-    const [err, updatedTodo] = await asyncWrapper(todosController.update(req.params, req.body));
-  if ( !err ) {
-    return helper.checkExistence( res, updatedTodo.matchedCount );
+router.patch('/:id', async (req, res, next) => {
+  const [err, updatedTodo] = await asyncWrapper(
+    todosController.update(req.params, req.body),
+  );
+  if (!err) {
+    return helper.checkExistence(res, updatedTodo.matchedCount);
   }
-  return next( err );
-  
+  return next(err);
 });
 router.delete('/:id', async (req, res) => {
-  try {body;
+  try {
     const deletedTodo = await todosController.deleteTodo(req.params);
     helper.checkExistence(res, deletedTodo.deletedCount);
   } catch (err) {
