@@ -9,7 +9,7 @@ const router = require('express').Router();
 const auth = require('../middlewares/auth');
 const { usersController, authController } = require('../controllers/index');
 const asyncWrapper = require('../utils/async-wrapper');
-const helper = require('../controllers/helper');
+const helper = require( '../controllers/index' );
 
 // parsing body as JSON object
 router.use(express.json());

@@ -13,4 +13,4 @@ const checkExistence = (res, obj) => {
 };
 module.exports = {
   checkExistence,
-};
+}

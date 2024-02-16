@@ -11,7 +11,9 @@ router.use(express.json());
 router.use(auth);
 
 router.post('/', async (req, res) => {
-  const [err, addedTodo] = await asyncWrapper(todosController.create(req.body));
+  const todo = req.body;
+  todo.userId = req.user.id;
+  const [err, addedTodo] = await asyncWrapper(todosController.create(todo));
   if (!err) {
     res.status(200).json({
       message: 'success',
@@ -49,19 +51,8 @@ router.get('/', async (req, res) => {
 });
 router.get('/:id', async (req, res) => {
   try {
-    const todo = await todosController.getTodo(req.params);
+    const todo = await todosController.getTodo(req.params, req.user.id);
     helper.checkExistence(res, todo);
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      errorMessage: 'id must be number',
-    });
-  }
-});
-router.patch('/:id', async (req, res) => {
-  try {
-    const updatedTodo = await todosController.update(req.params, req.body);
-    helper.checkExistence(res, updatedTodo.matchedCount);
   } catch (err) {
     res.status(400).json({
       status: 'fail',
@@ -69,8 +60,16 @@ router.patch('/:id', async (req, res) => {
     });
   }
 });
+router.patch('/:id', async (req, res) => {
+    const [err, updatedTodo] = await asyncWrapper(todosController.update(req.params, req.body));
+  if ( !err ) {
+    return helper.checkExistence( res, updatedTodo.matchedCount );
+  }
+  return next( err );
+  
+});
 router.delete('/:id', async (req, res) => {
-  try {
+  try {body;
     const deletedTodo = await todosController.deleteTodo(req.params);
     helper.checkExistence(res, deletedTodo.deletedCount);
   } catch (err) {

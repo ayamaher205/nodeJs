@@ -2,5 +2,5 @@
 module.exports = {
   todosController: require('./todos'),
   usersController: require('./users'),
-  helperController: require('./helper'),
+  helper: require('./helper-functions'),
 };

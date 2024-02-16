@@ -5,8 +5,8 @@ const getAll = async () => {
   const todo = await ToDos.find();
   return todo;
 };
-const getTodo = async (id) => {
-  const todo = await ToDos.findOne(id);
+const getTodo = async (id, userId) => {
+  const todo = await ToDos.findOne(id, userId);
   return todo;
 };
 const create = async (todo) => {
